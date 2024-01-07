@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 @Service
 public class SurveyService {
@@ -43,5 +44,13 @@ public class SurveyService {
          Optional<Survey> optionalSurvey = surveys.stream().filter(predicate).findFirst();
          if (optionalSurvey.isEmpty()) return  null;
          return optionalSurvey.get();
+    }
+
+    public Optional<List<Question>> retriveallquestions(String surveyid) {
+        return surveys.stream().filter(survey -> surveyid.equals(survey.getId())).map(survey -> survey.getQuestions()).findFirst();
+    }
+
+    public Optional<Stream<Question>> retrivequestionbyid(String surveyid, String questionid) {
+        return surveys.stream().filter(survey -> surveyid.equals(survey.getId())).map(survey -> survey.getQuestions().stream().filter(question -> questionid.equals(question.getId()))).findFirst();
     }
 }
