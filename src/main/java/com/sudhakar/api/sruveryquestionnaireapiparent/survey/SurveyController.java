@@ -1,14 +1,13 @@
 package com.sudhakar.api.sruveryquestionnaireapiparent.survey;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 @RestController
 public class SurveyController {
@@ -34,12 +33,29 @@ public class SurveyController {
     }
 
     @RequestMapping("/surveys/{surveyid}/questions")
-    public Optional<List<Question>> retriveallquestions(@PathVariable String surveyid){
-        return surveyService.retriveallquestions(surveyid);
+    public List<Question> retriveallquestions(@PathVariable String surveyid){
+        List<Question> questions = surveyService.retriveallquestions(surveyid);
+        if(questions == null){
+            throw  new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        return questions;
     }
 
     @RequestMapping("/surveys/{surveyid}/questions/{questionid}")
-    public Optional<Stream<Question>> retrivequestionbyid(@PathVariable String surveyid, @PathVariable String questionid){
-        return surveyService.retrivequestionbyid(surveyid,questionid);
+    public Question retrivequestionbyid(@PathVariable String surveyid, @PathVariable String questionid){
+        Question specificquestion = surveyService.retrivequestionbyid(surveyid, questionid);
+
+        if (specificquestion==null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+        return specificquestion;
+    }
+
+    @RequestMapping(value = "/surveys/{surveyid}/questions", method = RequestMethod.POST)
+    public ResponseEntity<Object> addQuestionToSurvey(@PathVariable String surveyid, @RequestBody Question question) {
+        String questionId = surveyService.addquestiontosruvey(surveyid,question);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{append}").buildAndExpand(questionId).toUri();
+        return ResponseEntity.created(location).build();
     }
 }

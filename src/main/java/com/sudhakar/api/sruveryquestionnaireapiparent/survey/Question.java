@@ -23,6 +23,10 @@ public class Question {
         return id;
     }
 
+    public void setId(String randomid) {
+        this.id = randomid;
+    }
+
     public String getDescription() {
         return description;
     }

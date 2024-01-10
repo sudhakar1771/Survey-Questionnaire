@@ -3,12 +3,13 @@ package com.sudhakar.api.sruveryquestionnaireapiparent.survey;
 
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 @Service
 public class SurveyService {
@@ -46,11 +47,29 @@ public class SurveyService {
          return optionalSurvey.get();
     }
 
-    public Optional<List<Question>> retriveallquestions(String surveyid) {
-        return surveys.stream().filter(survey -> surveyid.equals(survey.getId())).map(survey -> survey.getQuestions()).findFirst();
+    public List<Question> retriveallquestions(String surveyid) {
+        Survey survey = retrivespecificsurvey(surveyid);
+        if (survey == null){
+            return null;
+        }
+        return survey.getQuestions();
     }
 
-    public Optional<Stream<Question>> retrivequestionbyid(String surveyid, String questionid) {
-        return surveys.stream().filter(survey -> surveyid.equals(survey.getId())).map(survey -> survey.getQuestions().stream().filter(question -> questionid.equals(question.getId()))).findFirst();
+    public Question retrivequestionbyid(String surveyid, String questionid) {
+        List<Question> allquestions = retriveallquestions(surveyid);
+        Optional<Question> question = allquestions.stream().filter(q -> questionid.equalsIgnoreCase(q.getId())).findFirst();
+        if (question.isEmpty()){
+            return null;
+        }
+        return question.get();
+    }
+
+    public String addquestiontosruvey(String surveyid, Question question) {
+        List<Question> questions = retriveallquestions(surveyid);
+        SecureRandom secureRandom = new SecureRandom();
+        String randomid = new BigInteger(32,secureRandom).toString();
+        question.setId(randomid);
+        questions.add(question);
+        return question.getId();
     }
 }
