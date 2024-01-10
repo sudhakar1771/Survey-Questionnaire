@@ -114,7 +114,7 @@ surveys.add(survey);
 **Request Body**
 ```
 {
-"name": "Sathish",
+"name": "Sudhakar",
 "role": "Admin"
 }
 ```
